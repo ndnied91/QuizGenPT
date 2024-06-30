@@ -1,0 +1,132 @@
+from fastapi import FastAPI , Query
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field 
+
+from utils import generate_question
+
+
+from fastapi import FastAPI, HTTPException
+from motor.motor_asyncio import AsyncIOMotorClient
+from pydantic import BaseModel
+from typing import List, Optional
+from pymongo.server_api import ServerApi
+from bson import ObjectId
+import json
+from datetime import datetime
+
+
+from dotenv import load_dotenv  # Import the load_dotenv function
+import os
+import pytz
+
+load_dotenv() 
+
+app = FastAPI()
+
+
+class Question(BaseModel):
+    category: str
+    questionCount: int
+    questionType: str
+    difficulty: str
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+MONGO_DETAILS = os.getenv("MONGO_URI")
+client = AsyncIOMotorClient(MONGO_DETAILS, tlsAllowInvalidCertificates=True)
+
+database = client['QuizDatabase']
+collection = database["UserQuizzes"]
+
+class Item(BaseModel):
+    id: Optional[str]
+    name: str
+    description: str
+
+def get_current_time_in_edt():
+    edt = pytz.timezone("US/Eastern")
+    return datetime.now(edt)
+
+class QuizItem(BaseModel):
+    id: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
+    timestamp: datetime = Field(default_factory=get_current_time_in_edt)
+    user: str
+    quiz: object
+    is_active: bool = True  # New boolean field set to True by default
+
+    class Config:
+        allow_population_by_field_name = True
+        json_encoders = {
+            ObjectId: str
+        }
+
+
+# Send a ping to confirm a successful connection
+try:
+    client.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    # print(e)
+    print("error")
+
+
+ 
+@app.get("/")
+async def read_root():
+    return {"message": "Welcome to the FastAPI + MongoDB app"}
+
+
+@app.get("/api/quiz", response_model=QuizItem)
+async def get_active_quiz_item(user: str = Query(...)):
+    # Retrieve a single document where is_active is True and user matches the query parameter
+    quiz_item = await collection.find_one({"is_active": True, "user": user})
+
+    if quiz_item is None:
+        raise HTTPException(status_code=404, detail="No active quiz item found for the specified user")
+
+    return quiz_item
+
+
+@app.post("/api/quiz")
+async def generate_quiz(user: str, question: Question):
+    # Generate the quiz based on the question
+    quiz_string = generate_question(
+        f"Question category: {question.category}, number of questions: {question.questionCount}, questionType of quiz: {question.questionType}, difficulty: {question.difficulty}"
+    )
+
+
+    try: # Convert the quiz string to an object
+        quiz_object = json.loads(quiz_string)
+    except json.JSONDecodeError:
+        return {"error": "Invalid quiz data received"}
+    # Create a QuizItem instance
+    print(user)
+
+    if user != 'null':
+        quiz_item = QuizItem(user=user, quiz=quiz_object)
+        # Convert the QuizItem instance to a dictionary
+        quiz_item_dict = quiz_item.dict(by_alias=True)  # Use by_alias=True to map `id` to `_id`
+        # Insert the document into the MongoDB collection
+        await collection.insert_one(quiz_item_dict)
+    return {"quiz": quiz_object}
+
+
+
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+
+
+
+
+
+
