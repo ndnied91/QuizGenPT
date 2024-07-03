@@ -1,12 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 
-const QuizQuestionnaire = ({
-  activeUser,
-  quiz,
-  setCompleted,
-  setAnswerKey,
-}) => {
+const QuizQuestionnaire = ({ quiz, setCompleted, setAnswerKey }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState('');
 
@@ -14,7 +9,6 @@ const QuizQuestionnaire = ({
     if (currentIndex < quiz.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
-      // alert("You've completed the questionnaire!");
       setCompleted(true);
     }
 

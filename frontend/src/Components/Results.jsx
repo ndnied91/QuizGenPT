@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import customFetch from '../utils/util';
+import { useGlobalContext } from './context';
 
-const Results = ({ answerKey, setCompleted }) => {
+const Results = ({ answerKey, setCompleted, activeUser, quizID, setQuiz }) => {
+  const {} = useGlobalContext();
+
   const [score, setScore] = useState('');
   const calculateScore = () => {
     let correct = 0;
@@ -17,6 +21,24 @@ const Results = ({ answerKey, setCompleted }) => {
     calculateScore();
   }, []);
 
+  const completeQuiz = async () => {
+    try {
+      const response = await customFetch.post(`/quiz/${quizID._id}`, {
+        user: quizID.user,
+        to_update: { is_active: false },
+      });
+      if (response.status === 200) {
+        console.log('Update successful');
+        setQuiz([]);
+        setCompleted(false);
+      } else {
+        console.log('Update failed');
+      }
+    } catch (e) {
+      console.log('Error:', e);
+    }
+  };
+
   return (
     <div className="text-center">
       <p className="text-3xl">Results</p>
@@ -31,6 +53,13 @@ const Results = ({ answerKey, setCompleted }) => {
         </div>
         <div className="bg-blue-500 w-max p-4 rounded-lg shadow-md text-white text-xl cursor-pointer">
           Get more similar question
+        </div>
+
+        <div
+          className="bg-green-500 w-max p-4 rounded-lg shadow-md text-white text-xl cursor-pointer"
+          onClick={activeUser ? completeQuiz : setQuiz([])}
+        >
+          Finish Quiz
         </div>
       </div>
     </div>

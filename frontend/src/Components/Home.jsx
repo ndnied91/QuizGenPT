@@ -1,16 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { SignedIn, SignedOut, UserButton, useUser } from '@clerk/clerk-react';
-import LoginModal from './Components/LoginModal';
-import Quiz from './Components/Quiz';
-import { useGlobalContext } from './Components/context';
-import Archives from './Components/Archives';
+import LoginModal from './LoginModal';
+import Quiz from './Quiz';
 
-const App = () => {
+const Home = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { activeUser } = useGlobalContext();
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
-  const [isArchives, setIsArchives] = useState(false);
+  const { user } = useUser();
+
+  const [activeUser, setActiveUser] = useState();
+
+  useEffect(() => {
+    setActiveUser(user);
+  }, [user]);
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
 
   return (
     <main className="m-10">
@@ -34,11 +43,8 @@ const App = () => {
               )}
 
               <div className="flex items-center gap-1 h-max">
-                <button
-                  onClick={() => setIsArchives(!isArchives)}
-                  className="bg-green-500 rounded-lg p-1 text-sm pl-3 pr-3 shadow-md cursor-pointer"
-                >
-                  {isArchives ? 'Back to Quiz' : 'Previous Quizzes'}
+                <button className="bg-green-500 rounded-lg p-1 text-sm pl-3 pr-3 shadow-md cursor-pointer">
+                  Previous Quizzes
                 </button>
                 <UserButton />
               </div>
@@ -47,11 +53,11 @@ const App = () => {
         </SignedIn>
 
         <div className="flex justify-center">
-          {isArchives ? <Archives /> : <Quiz />}
+          <Quiz activeUser={activeUser} />
         </div>
       </div>
     </main>
   );
 };
 
-export default App;
+export default Home;

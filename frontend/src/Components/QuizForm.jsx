@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { act, useState } from 'react';
 import customFetch from '../utils/util';
-import { formatData } from '../utils/supportFuncs';
 import { Spinner } from './Spinner';
+import { useGlobalContext } from './context';
 
-const QuizForm = ({ activeUser, setQuiz }) => {
+const QuizForm = () => {
+  const { setQuiz, activeUser, setQuizID } = useGlobalContext();
   const [category, setCategory] = useState('Dogs');
   const [questionType, setQuestionType] = useState('multiple choice');
   const [difficulty, setDifficulty] = useState('easy');
@@ -36,7 +37,7 @@ const QuizForm = ({ activeUser, setQuiz }) => {
     setLoading(true);
     e.preventDefault();
     try {
-      const response = await customFetch.post(
+      const { data } = await customFetch.post(
         '/quiz?user=' + encodeURIComponent(activeUser ? activeUser?.id : null),
         {
           category,
@@ -46,7 +47,14 @@ const QuizForm = ({ activeUser, setQuiz }) => {
         }
       );
 
-      setQuiz(response.data.quiz); //save questions
+      if (activeUser) {
+        setQuiz(data.quiz); //save questions
+        setQuizID({ _id: data._id, user: data.user });
+      } else {
+        setQuiz(data); //save questions
+        setQuizID({ _id: 'guest', user: 'guest' });
+      }
+
       setLoading(false);
     } catch (error) {
       console.error(

@@ -1,11 +1,12 @@
-from fastapi import FastAPI , Query
+from fastapi import FastAPI , Query , Body
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from pydantic import BaseModel, Field 
 
 from utils import generate_question
 
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException , status
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 from typing import List, Optional
@@ -13,6 +14,8 @@ from pymongo.server_api import ServerApi
 from bson import ObjectId
 import json
 from datetime import datetime
+from typing import Dict, Any
+from pymongo import ReturnDocument
 
 
 from dotenv import load_dotenv  # Import the load_dotenv function
@@ -89,9 +92,33 @@ async def get_active_quiz_item(user: str = Query(...)):
     quiz_item = await collection.find_one({"is_active": True, "user": user})
 
     if quiz_item is None:
-        raise HTTPException(status_code=404, detail="No active quiz item found for the specified user")
-
+        raise HTTPException(status_code=204, detail="No active quiz item found for the specified user")
     return quiz_item
+
+class UpdateRequest(BaseModel):
+    user: str
+    to_update: Dict[str, Any]
+
+
+@app.post("/api/quiz/{_id}")
+async def update_item(_id: str, body: UpdateRequest = Body(...)):
+    user = body.user
+    to_update = body.to_update
+    
+    print("ID:", _id)
+    print("User:", user)
+    print("To Update:", to_update)
+
+    quiz_item = await collection.find_one({"_id": _id, "user": user})
+    
+    if not quiz_item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    
+
+    # update_data = {"$set": to_update }
+    await collection.find_one_and_update({"_id": _id, "user": user}, {"$set": to_update })
+
+    return Response(status_code=status.HTTP_200_OK)
 
 
 @app.post("/api/quiz")
@@ -100,22 +127,30 @@ async def generate_quiz(user: str, question: Question):
     quiz_string = generate_question(
         f"Question category: {question.category}, number of questions: {question.questionCount}, questionType of quiz: {question.questionType}, difficulty: {question.difficulty}"
     )
-
-
+    
     try: # Convert the quiz string to an object
         quiz_object = json.loads(quiz_string)
     except json.JSONDecodeError:
         return {"error": "Invalid quiz data received"}
     # Create a QuizItem instance
-    print(user)
+    
 
     if user != 'null':
         quiz_item = QuizItem(user=user, quiz=quiz_object)
         # Convert the QuizItem instance to a dictionary
         quiz_item_dict = quiz_item.dict(by_alias=True)  # Use by_alias=True to map `id` to `_id`
         # Insert the document into the MongoDB collection
-        await collection.insert_one(quiz_item_dict)
-    return {"quiz": quiz_object}
+        db_response = await collection.insert_one(quiz_item_dict)
+
+        # Get the inserted_id from the db_response
+        inserted_id = db_response.inserted_id
+    
+        # Retrieve the inserted document from the database
+        inserted_document = await collection.find_one({"_id": inserted_id})
+        return inserted_document
+    else:
+        return quiz_object
+
 
 
 
