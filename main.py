@@ -33,6 +33,13 @@ class Question(BaseModel):
     questionType: str
     difficulty: str
 
+class URL_Question(BaseModel):
+    article: str
+    questionCount: int
+    questionType: str
+    difficulty: str
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
@@ -70,6 +77,10 @@ class QuizItem(BaseModel):
             ObjectId: str
         }
 
+class UpdateRequest(BaseModel):
+    user: str
+    to_update: Dict[str, Any]
+
 
 # Send a ping to confirm a successful connection
 try:
@@ -81,7 +92,7 @@ except Exception as e:
 
 
  
-@app.get("/")
+@app.get("/api")
 async def read_root():
     return {"message": "Welcome to the FastAPI + MongoDB app"}
 
@@ -95,9 +106,37 @@ async def get_active_quiz_item(user: str = Query(...)):
         raise HTTPException(status_code=204, detail="No active quiz item found for the specified user")
     return quiz_item
 
-class UpdateRequest(BaseModel):
-    user: str
-    to_update: Dict[str, Any]
+
+@app.post("/api/quiz/article")
+async def generate_quiz(user: str, url_question: URL_Question):
+    quiz_string = generate_question(
+        f"This is a URL from an article: {url_question.article}, number of questions: {url_question.questionCount}, questionType of quiz: {url_question.questionType}, difficulty: {url_question.difficulty}, please JUST provide the data in the object form."
+    )
+    print(quiz_string)
+    try: # Convert the quiz string to an object
+        quiz_object = json.loads(quiz_string)
+        print(quiz_object)
+    except json.JSONDecodeError:
+        return {"error": "Invalid quiz data received"}
+    # Create a QuizItem instance
+    
+    if user != 'null':
+        quiz_item = QuizItem(user=user, quiz=quiz_object)
+        # Convert the QuizItem instance to a dictionary
+        quiz_item_dict = quiz_item.dict(by_alias=True)  # Use by_alias=True to map `id` to `_id`
+        # Insert the document into the MongoDB collection
+        db_response = await collection.insert_one(quiz_item_dict)
+
+        # Get the inserted_id from the db_response
+        inserted_id = db_response.inserted_id
+    
+        # Retrieve the inserted document from the database
+        inserted_document = await collection.find_one({"_id": inserted_id})
+        return inserted_document
+    else:
+        return quiz_object
+    
+
 
 
 @app.post("/api/quiz/{_id}")
@@ -153,6 +192,13 @@ async def generate_quiz(user: str, question: Question):
 
 
 
+@app.get("/api/archives/{user}")
+async def get_user_archives(user: str):
+    quiz_cursor = collection.find({"is_active": False, "user": user})
+    quiz_items = await quiz_cursor.to_list(length=None)
+    if not quiz_items:
+        raise HTTPException(status_code=204, detail="No archived quiz items found for the specified user")
+    return quiz_items
 
 
 

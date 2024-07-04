@@ -87,3 +87,35 @@
     opacity: 0;
   }
 }
+
+
+
+
+
+
+.line-with-fade {
+  position: relative;
+  text-align: center;
+  width: 100%;
+}
+
+.line-with-fade::before,
+.line-with-fade::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5));
+}
+
+.line-with-fade::before {
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.line-with-fade::after {
+  right: 0;
+  transform: translateY(-50%);
+  background: linear-gradient(to left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5));
+}

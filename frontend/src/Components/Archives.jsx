@@ -3,19 +3,47 @@ import { useGlobalContext } from './context';
 import customFetch from '../utils/util';
 
 const Archives = () => {
-  const { archives, activeUser } = useGlobalContext();
-  console.log(activeUser);
+  const { archives, setArchives, activeUser } = useGlobalContext();
+
   useEffect(() => {
-    console.log('component loaded..');
-    getArchives();
-  }, []);
+    const getActiveQuiz = async () => {
+      try {
+        const { data } = await customFetch.get(`/archives/${activeUser.id}`);
+        if (data) {
+          setArchives(data);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    if (activeUser) getActiveQuiz();
+  }, [activeUser]);
 
-  const getArchives = async () => {
-    const response = await customFetch(`/quiz/archives/${activeUser.id}`);
-    //next up
-  };
+  console.log(archives);
+  return (
+    <div className="w-screen h-fit">
+      <div className="text-xl font-bold">Archives</div>
 
-  return <div>Archives</div>;
+      <div className="h-1/2 overflow-scroll bg-blue-100">
+        {archives.map((item) => (
+          <div className="">
+            <div
+              key={item._id}
+              className="bg-gray-100 m-2 p-2 cursor-pointer shadow-md"
+            >
+              <div className="flex justify-between items-center">
+                <div>{item.quiz[0].question}</div>
+                <div className="bg-blue-300 w-fit p-2 rounded-md shadow">
+                  {' '}
+                  Retake
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default Archives;

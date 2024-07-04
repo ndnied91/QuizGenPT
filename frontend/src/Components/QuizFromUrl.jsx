@@ -1,23 +1,25 @@
 import React, { useState } from 'react';
+import { useGlobalContext } from './context';
 import customFetch from '../utils/util';
 import { Spinner } from './Spinner';
-import { useGlobalContext } from './context';
 
-const QuizForm = () => {
+const QuizFromUrl = () => {
   const { setQuiz, activeUser, setQuizID } = useGlobalContext();
-  const [category, setCategory] = useState('Dogs');
+  const [article, setArticle] = useState(
+    'https://education.nationalgeographic.org/resource/planet/'
+  );
   const [questionType, setQuestionType] = useState('multiple choice');
   const [difficulty, setDifficulty] = useState('easy');
   const [questionCount, setQuestionCount] = useState('1');
   const [loading, setLoading] = useState(false);
 
-  const handleCategoryChange = (e) => {
-    setCategory(e.target.value);
+  const handleArticleChange = (e) => {
+    setArticle(e.target.value);
   };
 
-  const handleQuestionTypeChange = (e) => {
-    setQuestionType(e.target.value);
-  };
+  // const handleQuestionTypeChange = (e) => {
+  //   setQuestionType(e.target.value);
+  // };
 
   const handleQuestionCountChange = (e) => {
     const value = e.target.value;
@@ -38,9 +40,10 @@ const QuizForm = () => {
     e.preventDefault();
     try {
       const { data } = await customFetch.post(
-        '/quiz?user=' + encodeURIComponent(activeUser ? activeUser?.id : null),
+        '/quiz/article/?user=' +
+          encodeURIComponent(activeUser ? activeUser?.id : null),
         {
-          category,
+          article,
           questionType,
           questionCount: Number(questionCount), // Ensure questionCount is a number
           difficulty,
@@ -55,6 +58,7 @@ const QuizForm = () => {
         setQuizID({ _id: 'guest', user: 'guest' });
       }
 
+      console.log(data);
       setLoading(false);
     } catch (error) {
       console.error(
@@ -72,7 +76,7 @@ const QuizForm = () => {
     );
   } else {
     return (
-      <div>
+      <div className="w-full">
         <form
           onSubmit={handleSubmit}
           className="p-4 max-w-md mx-auto flex flex-col w-screen"
@@ -80,38 +84,20 @@ const QuizForm = () => {
           <div className="mb-4">
             <label
               className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="category"
+              htmlFor="article"
             >
-              Category
+              URL
             </label>
             <input
               required
               type="text"
-              id="category"
-              placeholder="Category"
-              value={category}
-              onChange={handleCategoryChange}
+              id="url"
+              value={article}
+              onChange={handleArticleChange}
+              placeholder="Please paste it the article URL"
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             />
           </div>
-
-          {/* <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="questionType"
-            >
-              Question Type
-            </label>
-            <select
-              id="questionType"
-              value={questionType}
-              onChange={handleQuestionTypeChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            >
-              <option value="multiple choice">Multiple Choice</option>
-              <option value="open ended">Open Ended</option>
-            </select>
-          </div> */}
 
           <div className="mb-4">
             <label
@@ -164,4 +150,4 @@ const QuizForm = () => {
   }
 };
 
-export default QuizForm;
+export default QuizFromUrl;

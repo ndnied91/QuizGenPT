@@ -10,10 +10,13 @@ const App = () => {
   const { activeUser } = useGlobalContext();
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
-  const [isArchives, setIsArchives] = useState(false);
+  const [isArchives, setIsArchives] = useState(true);
 
   return (
-    <main className="m-10">
+    <main
+      className="m-10 overflow-x-hidden overflow-y-scroll h-[80vh]"
+      id="sdfasd"
+    >
       <SignedOut>
         <button
           onClick={handleOpenModal}
@@ -46,7 +49,7 @@ const App = () => {
           </div>
         </SignedIn>
 
-        <div className="flex justify-center">
+        <div className="flex justify-center overflow-y-scroll">
           {isArchives ? <Archives /> : <Quiz />}
         </div>
       </div>
