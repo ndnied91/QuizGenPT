@@ -192,6 +192,17 @@ async def generate_quiz(user: str, question: Question):
 
 
 
+# @app.put("/api/archives/update/{user}")
+# async def reactivate_quiz(user: str = Query(...)):
+#     # Retrieve a single document where is_active is True and user matches the query parameter
+#     quiz_item = await collection.find_one({"is_active": False, "user": user})
+
+#     if quiz_item is None:
+#         raise HTTPException(status_code=204, detail="No active quiz item found for the specified user")
+#     return quiz_item
+
+
+
 @app.get("/api/archives/{user}")
 async def get_user_archives(user: str):
     quiz_cursor = collection.find({"is_active": False, "user": user})
@@ -199,6 +210,8 @@ async def get_user_archives(user: str):
     if not quiz_items:
         raise HTTPException(status_code=204, detail="No archived quiz items found for the specified user")
     return quiz_items
+
+
 
 
 

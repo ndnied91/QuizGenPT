@@ -2,7 +2,14 @@ import React, { useEffect, useState } from 'react';
 import customFetch from '../utils/util';
 import { useGlobalContext } from './context';
 
-const Results = ({ answerKey, setCompleted, activeUser, quizID, setQuiz }) => {
+const Results = ({
+  answerKey,
+  setCompleted,
+  activeUser,
+  quizID,
+  setQuiz,
+  quiz,
+}) => {
   const {} = useGlobalContext();
 
   const [score, setScore] = useState('');
@@ -39,6 +46,17 @@ const Results = ({ answerKey, setCompleted, activeUser, quizID, setQuiz }) => {
     }
   };
 
+  const handleFinishQuiz = () => {
+    if (activeUser) {
+      completeQuiz();
+    } else {
+      setQuiz([]);
+      setCompleted(false);
+    }
+  };
+
+  console.log(quiz);
+
   return (
     <div className="text-center">
       <p className="text-3xl">Results</p>
@@ -57,7 +75,7 @@ const Results = ({ answerKey, setCompleted, activeUser, quizID, setQuiz }) => {
 
         <div
           className="bg-green-500 w-max p-4 rounded-lg shadow-md text-white text-xl cursor-pointer"
-          onClick={activeUser ? completeQuiz : setQuiz([])}
+          onClick={handleFinishQuiz}
         >
           Finish Quiz
         </div>
