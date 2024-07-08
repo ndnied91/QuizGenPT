@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useGlobalContext } from './context';
 import customFetch from '../utils/util';
 import { Spinner } from './Spinner';
+import FormItem from './FormItem';
 
 const QuizFromUrl = () => {
   const { setQuiz, activeUser, setQuizID } = useGlobalContext();
@@ -77,60 +78,29 @@ const QuizFromUrl = () => {
           onSubmit={handleSubmit}
           className="p-4 max-w-md mx-auto flex flex-col lg:w-screen sm:w-full"
         >
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold"
-              htmlFor="article"
-            >
-              URL
-            </label>
-            <input
-              required
-              type="text"
-              id="url"
-              value={article}
-              onChange={handleArticleChange}
-              placeholder="Please paste it the article URL"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div>
+          <FormItem
+            itemName={'article'}
+            placeholder={'Please paste it the article URL'}
+            itemValue={article}
+            handleChangeFunc={handleArticleChange}
+            type="text"
+          />
 
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold"
-              htmlFor="questionType"
-            >
-              Difficulty
-            </label>
-            <select
-              id="questionType"
-              value={difficulty}
-              onChange={handleQuestionDifficulty}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            >
-              <option value="easy">Easy</option>
-              <option value="Medium">Medium</option>
-              <option value="Hard">Hard</option>
-            </select>
-          </div>
+          <FormItem
+            itemName={'Difficulty'}
+            itemValue={difficulty}
+            handleChangeFunc={handleQuestionDifficulty}
+            itemType={'select'}
+            options={['easy', 'medium', 'hard']}
+          />
 
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold"
-              htmlFor="questionCount"
-            >
-              Number of questions
-            </label>
-            <input
-              required
-              type="text"
-              id="questionCount"
-              placeholder="How many questions"
-              value={questionCount}
-              onChange={handleQuestionCountChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div>
+          <FormItem
+            itemName={'Number of questions'}
+            placeholder={'How many questions'}
+            itemValue={questionCount}
+            handleChangeFunc={handleQuestionCountChange}
+            type="text"
+          />
 
           <div className="flex items-center justify-between mt-4">
             <button

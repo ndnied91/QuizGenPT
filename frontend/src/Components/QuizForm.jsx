@@ -3,7 +3,6 @@ import customFetch from '../utils/util';
 import { Spinner } from './Spinner';
 import { toast } from 'react-toastify';
 import { useGlobalContext } from './context';
-import Form from './Form';
 import FormItem from './FormItem';
 
 const QuizForm = ({ loading, setLoading }) => {
@@ -86,43 +85,6 @@ const QuizForm = ({ loading, setLoading }) => {
             type="text"
           />
 
-          {/* <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold"
-              htmlFor="category"
-            >
-              Category
-            </label>
-            <input
-              required
-              type="text"
-              id="category"
-              placeholder="Category"
-              value={category}
-              onChange={handleCategoryChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div> */}
-
-          {/* <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold"
-              htmlFor="questionType"
-            >
-              Difficulty
-            </label>
-            <select
-              id="questionType"
-              value={difficulty}
-              onChange={handleQuestionDifficulty}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            >
-              <option value="easy">Easy</option>
-              <option value="Medium">Medium</option>
-              <option value="Hard">Hard</option>
-            </select>
-          </div> */}
-
           <FormItem
             itemName={'Difficulty'}
             itemValue={difficulty}
@@ -130,24 +92,6 @@ const QuizForm = ({ loading, setLoading }) => {
             itemType={'select'}
             options={['easy', 'medium', 'hard']}
           />
-
-          {/* <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold"
-              htmlFor="questionCount"
-            >
-              Number of questions
-            </label>
-            <input
-              required
-              type="text"
-              id="questionCount"
-              placeholder="How many questions"
-              value={questionCount}
-              onChange={handleQuestionCountChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div> */}
 
           <FormItem
             itemName={'Number of questions'}

@@ -152,8 +152,8 @@ const Results = ({
         <div
           className="bg-gradient-to-r from-red-500 to-red-600 text-white text-lg font-semibold rounded-lg shadow-lg cursor-pointer py-3 px-6 lg:py-4 lg:px-8 transition-transform duration-300 ease-in-out transform hover:scale-105 w-full lg:w-auto text-center"
           onClick={() => {
-            setAnswerKey([]);
             setCompleted(false);
+            setAnswerKey([]);
           }}
         >
           Retake Test
@@ -168,8 +168,8 @@ const Results = ({
         <div
           className="bg-gradient-to-r from-green-500 to-green-600 text-white text-lg font-semibold rounded-lg shadow-lg cursor-pointer py-3 px-6 lg:py-4 lg:px-8 transition-transform duration-300 ease-in-out transform hover:scale-105 w-full lg:w-auto text-center"
           onClick={() => {
-            setAnswerKey([]);
             handleFinishQuiz();
+            setAnswerKey([]);
           }}
         >
           Finish Quiz
