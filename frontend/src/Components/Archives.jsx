@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useGlobalContext } from './context';
 import customFetch from '../utils/util';
-import { FaArrowDown, FaArrowUp } from 'react-icons/fa';
+import { FaArrowDown, FaArrowUp, FaTrashAlt } from 'react-icons/fa';
 
 const Archives = ({ setIsArchives }) => {
   const { archives, setArchives, activeUser, setQuiz, setQuizID } =
     useGlobalContext();
-  const [isOpen, setIsOpen] = useState(false);
+
   const [openTest, setOpenTest] = useState('');
 
   useEffect(() => {
@@ -43,17 +43,33 @@ const Archives = ({ setIsArchives }) => {
     }
   };
 
+  const deleteItem = async (item) => {
+    try {
+      const response = await customFetch.delete(
+        `/quiz/${item._id}?user=${activeUser.id}`
+      );
+
+      if (response.status === 200) {
+        setArchives(archives.filter((quiz) => quiz !== item));
+      } else {
+        console.log('Update failed');
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return (
     <div className="w-screen h-fit">
       <div className="text-xl font-bold">Archives</div>
-      <div className="h-1/2 overflow-scroll bg-blue-100">
+      <div className="h-1/2 overflow-scroll ">
         {archives.map((item) => {
           const isOpen = openTest === item._id;
           return (
             <div key={item._id} className="m-2">
               <div
                 className={`bg-gray-100 w-full cursor-pointer shadow-md duration-300 ${
-                  isOpen ? 'h-36' : 'h-14'
+                  isOpen ? 'h-24' : 'h-14'
                 }`}
                 onClick={() => setOpenTest(isOpen ? null : item._id)}
                 style={{
@@ -66,18 +82,31 @@ const Archives = ({ setIsArchives }) => {
                     <div className="flex items-center gap-2">
                       {isOpen ? <FaArrowUp /> : <FaArrowDown />}
 
-                      {item.quiz[0].question}
+                      <p className="text-xs lg:text-md">
+                        {item?.quiz[0]?.question}
+                      </p>
                     </div>
                   </div>
-                  <div
-                    className="bg-blue-300 w-fit p-2 rounded-md shadow"
-                    onClick={() => updateQuizStatus(item)}
-                  >
-                    Retake
+                  {/*  */}
+                  <div className="flex">
+                    <div
+                      className="text-sm ml-4 bg-gradient-to-r from-blue-400 to-blue-500 text-white font-semibold flex items-center px-2 rounded-md shadow-md hover:from-blue-500 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 h-8"
+                      onClick={() => updateQuizStatus(item)}
+                    >
+                      Retake
+                    </div>
+                    {/*  */}
+                    <div
+                      className="text-sm ml-2 bg-gradient-to-r from-red-400 to-red-500 text-white font-semibold flex items-center px-2 rounded-md shadow-md hover:from-blue-500 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 h-8"
+                      onClick={() => deleteItem(item)}
+                    >
+                      <FaTrashAlt />
+                    </div>
                   </div>
+                  {/*  */}
                 </div>
                 {isOpen && (
-                  <div className="ml-4">
+                  <div className="ml-4 text-xs lg:text-md">
                     {item.quiz[0].answers.map((answer, index) => (
                       <p key={answer}>
                         {String.fromCharCode(65 + index)}. {answer}

@@ -17,10 +17,6 @@ const QuizFromUrl = () => {
     setArticle(e.target.value);
   };
 
-  // const handleQuestionTypeChange = (e) => {
-  //   setQuestionType(e.target.value);
-  // };
-
   const handleQuestionCountChange = (e) => {
     const value = e.target.value;
     if (!isNaN(value)) {
@@ -76,14 +72,14 @@ const QuizFromUrl = () => {
     );
   } else {
     return (
-      <div className="w-full">
+      <div className="w-screen">
         <form
           onSubmit={handleSubmit}
-          className="p-4 max-w-md mx-auto flex flex-col w-screen"
+          className="p-4 max-w-md mx-auto flex flex-col lg:w-screen sm:w-full"
         >
           <div className="mb-4">
             <label
-              className="block text-gray-700 text-sm font-bold mb-2"
+              className="block text-gray-700 text-sm font-bold"
               htmlFor="article"
             >
               URL
@@ -101,7 +97,7 @@ const QuizFromUrl = () => {
 
           <div className="mb-4">
             <label
-              className="block text-gray-700 text-sm font-bold mb-2"
+              className="block text-gray-700 text-sm font-bold"
               htmlFor="questionType"
             >
               Difficulty
@@ -120,10 +116,10 @@ const QuizFromUrl = () => {
 
           <div className="mb-4">
             <label
-              className="block text-gray-700 text-sm font-bold mb-2"
+              className="block text-gray-700 text-sm font-bold"
               htmlFor="questionCount"
             >
-              How many questions
+              Number of questions
             </label>
             <input
               required
@@ -136,10 +132,10 @@ const QuizFromUrl = () => {
             />
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mt-4">
             <button
               type="submit"
-              className="bg-blue-500 hover:bg-blue-700 w-full tracking-wider text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              className="w-full py-3 px-4 bg-gradient-to-r from-blue-400 to-blue-500 text-white font-semibold rounded-lg shadow-md transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
             >
               Submit
             </button>

@@ -1,6 +1,7 @@
 export const Spinner = () => {
   return (
-    <section className="text-center absolute top-1/2 left-1/2">
+    <section className="flex justify-center mt-[20vh]">
+      <div className="pt-20 text-sm font-semibold">Loading quiz data..</div>
       <div className="lds-spinner">
         <div></div>
         <div></div>

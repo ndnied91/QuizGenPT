@@ -4,6 +4,9 @@
 
 
 
+body {
+  background-color: rgb(249, 250, 251);
+}
 
 
 .lds-spinner {
@@ -118,4 +121,10 @@
   right: 0;
   transform: translateY(-50%);
   background: linear-gradient(to left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5));
+}
+
+
+.cl-avatarBox{
+  height: 40px;
+  width: 40px;
 }

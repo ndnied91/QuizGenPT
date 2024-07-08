@@ -25,7 +25,7 @@ const QuizQuestionnaire = ({ quiz, setCompleted, setAnswerKey }) => {
   };
 
   return (
-    <div className="">
+    <div className="p-4">
       <div className="flex flex-col items-center justify-center ">
         <div className="w-1/2 bg-gray-300 h-4 rounded mb-4">
           <div
@@ -35,7 +35,7 @@ const QuizQuestionnaire = ({ quiz, setCompleted, setAnswerKey }) => {
         </div>
         <div className="text-lg p-4 bg-gray-100 rounded shadow-md">
           <p className="font-bold">
-            {currentIndex}. {quiz[currentIndex].question}
+            {currentIndex + 1}. {quiz[currentIndex].question}
           </p>
 
           <div className="cursor-pointer">
@@ -43,12 +43,14 @@ const QuizQuestionnaire = ({ quiz, setCompleted, setAnswerKey }) => {
               return (
                 <div
                   className={
-                    selectedAnswer === answer ? 'text-red-300' : 'text-gray-900'
+                    selectedAnswer === answer ? 'text-red-500' : 'text-gray-900'
                   }
                   key={index}
                   onClick={() => setSelectedAnswer(answer)}
                 >
-                  <span className="pl-2">{answer}</span>
+                  <p key={answer} className="pl-1">
+                    {String.fromCharCode(65 + index)}. {answer}
+                  </p>
                 </div>
               );
             })}

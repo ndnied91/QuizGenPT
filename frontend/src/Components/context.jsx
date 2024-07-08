@@ -6,7 +6,7 @@ const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
   const { user } = useUser();
-  const [items, setItems] = useState([]); //main todos
+  // const [items, setItems] = useState([]); //main todos
   const [activeUser, setActiveUser] = useState();
   const [quiz, setQuiz] = useState();
   const [quizID, setQuizID] = useState('');
@@ -22,6 +22,7 @@ export const AppProvider = ({ children }) => {
         const { data } = await customFetch.get(
           `/quiz?user=${encodeURIComponent(activeUser?.id)}`
         );
+        console.log(data);
         if (data) {
           setQuizID({ _id: data._id, user: data.user });
           setQuiz(data.quiz);
@@ -34,7 +35,7 @@ export const AppProvider = ({ children }) => {
   return (
     <AppContext.Provider
       value={{
-        items,
+        // items,
         activeUser,
         quiz,
         setQuiz,
