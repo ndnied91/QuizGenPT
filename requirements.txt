@@ -1,8 +1,6 @@
-fastapi==0.78.0
-uvicorn==0.17.0
-pydantic==1.9.0
-requests==2.27.1
-cython==3.0.10
+fastapi
+uvicorn
+pydantic
 a2wsgi==1.10.6
 aioquic==1.2.0
 attr==0.3.2
@@ -12,8 +10,9 @@ cached_property==1.5.2
 chardet==5.2.0
 colorama==0.4.6
 ConfigParser==7.0.0
-ctypes_snappy==1.1
+ctypes_snappy==1.03
 curio==1.6
+cython==3.0.10
 disco==1.40.4
 dj_database_url==2.2.0
 dj_email_url==1.0.6
