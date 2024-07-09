@@ -128,3 +128,21 @@ body {
   height: 40px;
   width: 40px;
 }
+
+
+
+/* Add this CSS to your styles */
+
+@keyframes heartbeat-opacity {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.heartbeat-container {
+  display: inline-block;
+  animation: heartbeat-opacity 2s ease-in-out infinite;
+}

@@ -9,11 +9,13 @@ import { FaArrowLeft } from 'react-icons/fa6';
 
 const App = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { activeUser } = useGlobalContext();
+  const { activeUser, quiz } = useGlobalContext();
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
   const [isArchives, setIsArchives] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+
+  console.log(quiz);
 
   return (
     <main className="lg:m-5 mt-5 overflow-x-hidden overflow-y-scroll h-[80vh] bg-gray-50">
@@ -89,6 +91,16 @@ const App = () => {
             </div>
           </div>
         </SignedIn>
+
+        {quiz === undefined && (
+          <div className="m-6 relative overflow-hidden bg-gradient-to-r from-green-400 to-blue-500 text-white text-center lg:text-2xl mt-10 font-bold tracking-widest p-6 rounded-lg shadow-lg transform transition-transform hover:scale-105 heartbeat-container">
+            Transform Your Learning Journey with QuizGPT: Where Every Question
+            Sparks a New Adventure!
+            <div className="heartbeat"></div>
+            <div className="heartbeat delay-1"></div>
+            <div className="heartbeat delay-2"></div>
+          </div>
+        )}
 
         <div className="flex justify-center ">
           {isArchives ? <Archives setIsArchives={setIsArchives} /> : <Quiz />}
