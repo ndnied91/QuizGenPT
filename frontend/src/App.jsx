@@ -93,12 +93,14 @@ const App = () => {
         </SignedIn>
 
         {quiz === undefined && (
-          <div className="m-6 relative overflow-hidden bg-gradient-to-r from-green-400 to-blue-500 text-white text-center lg:text-2xl mt-10 font-bold tracking-widest p-6 rounded-lg shadow-lg transform transition-transform hover:scale-105 heartbeat-container">
-            Transform Your Learning Journey with QuizGPT: Where Every Question
-            Sparks a New Adventure!
-            <div className="heartbeat"></div>
-            <div className="heartbeat delay-1"></div>
-            <div className="heartbeat delay-2"></div>
+          <div className="w-screen text-center">
+            <div className="m-6 relative overflow-hidden bg-gradient-to-r from-green-400 to-blue-500 text-white text-center lg:text-2xl mt-10 font-bold tracking-widest p-4 rounded-lg shadow-lg transform transition-transform hover:scale-105 heartbeat-container">
+              Transform Your Learning Journey with QuizGPT: Where Every Question
+              Sparks a New Adventure!
+              <div className="heartbeat"></div>
+              <div className="heartbeat delay-1"></div>
+              <div className="heartbeat delay-2"></div>
+            </div>
           </div>
         )}
 
