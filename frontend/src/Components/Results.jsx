@@ -108,8 +108,6 @@ const Results = ({
     }
   };
 
-  console.log(quiz);
-
   return (
     <div className="">
       <div>
