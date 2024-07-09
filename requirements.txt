@@ -11,7 +11,7 @@ cached_property==1.5.2
 chardet==5.2.0
 colorama==0.4.6
 ConfigParser==7.0.0
-ctypes_snappy==1.03
+ctypes_snappy==1.1
 curio==1.6
 cython==3.0.10
 disco==1.40.4
