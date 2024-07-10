@@ -10,9 +10,9 @@ dotenv.config();
 //   build: {
 //     outDir: 'dist', // This is the default, but ensure it's set if you've customized it
 //   },
-//   define: {
-//     'process.env': process.env,
-//   },
+// define: {
+//   'process.env': process.env,
+// },
 //   proxy: {
 //     '/api': {
 //       target: 'http://localhost:8000/api',
@@ -31,5 +31,8 @@ export default defineConfig({
         sourcemap: true, // Optional: useful for debugging
       },
     },
+  },
+  define: {
+    'process.env': process.env,
   },
 });
