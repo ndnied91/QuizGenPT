@@ -10,4 +10,7 @@ export default defineConfig({
   define: {
     'process.env': process.env,
   },
+  build: {
+    outDir: 'dist', // This is the default, but ensure it's set if you've customized it
+  },
 });
