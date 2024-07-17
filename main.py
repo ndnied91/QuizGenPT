@@ -295,10 +295,8 @@ async def remove_item(_id: str, user: str = Query(...)):
 
 
 
-import asyncio
 
-async def main():
-    # Your application startup code here
+import uvicorn
 
-    if __name__ == "__main__":
-        asyncio.run(main())
+if __name__ == "__main__":
+    uvicorn.run("app:app", host="0.0.0.0", port=5000, log_level="info")        
