@@ -43,10 +43,17 @@ app = FastAPI(title='QuizApp')
 app.add_event_handler("startup", connect_db)
 app.add_event_handler("shutdown", close_db)
 
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+
+if ENVIRONMENT == "prod":
+    allowed_origins = ["https://quizgenpt.onrender.com"]
+else:
+    allowed_origins = ["*"] 
+
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for initial setup
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
