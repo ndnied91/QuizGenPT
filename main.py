@@ -12,6 +12,8 @@ import pytz
 from dotenv import load_dotenv
 from pymongo import errors
 import asyncio
+from motor.motor_asyncio import AsyncIOMotorClient
+from typing import Optional
 
 from utils import generate_question
 
@@ -30,10 +32,16 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import json
 from pymongo import errors
 
+from mongodb import connect_db, close_db, get_db_client
 
 load_dotenv()
 
-app = FastAPI()
+# app = FastAPI()
+app = FastAPI(title='QuizApp')
+
+# Register startup and shutdown event handlers
+app.add_event_handler("startup", connect_db)
+app.add_event_handler("shutdown", close_db)
 
 
 app.add_middleware(
@@ -43,6 +51,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+db_client: Optional[AsyncIOMotorClient] = None
 
 MONGO_DETAILS = os.getenv("MONGO_URI")
 client = AsyncIOMotorClient(MONGO_DETAILS, tlsAllowInvalidCertificates=True)
@@ -198,27 +208,30 @@ except Exception as e:
 
 
 
-# Function to generate and insert a quiz
+# Function to generate and insert quiz into the MongoDB collection
 async def generate_and_insert_quiz(user: str, quiz_string: str):
+    """Generate a quiz and insert it into the database."""
     try:
         quiz_object = json.loads(quiz_string)
     except json.JSONDecodeError:
-        print("Invalid quiz data received")
         return {"error": "Invalid quiz data received"}
 
-    print(f"User: {user}")
     if user != 'null':
         try:
             quiz_item = QuizItem(user=user, quiz=quiz_object)
             quiz_item_dict = quiz_item.dict(by_alias=True)
+
+            # Get the database client and access the collection
+            db_client = await get_db_client()
+            db = db_client['QuizDatabase']  # Use your actual database name
+            collection = db['UserQuizzes']  # Use your actual collection name
+
             db_response = await collection.insert_one(quiz_item_dict)
             inserted_document = await collection.find_one({"_id": db_response.inserted_id})
             return inserted_document
         except errors.PyMongoError as e:
-            print(f"PyMongoError: {e}")
             return {"error": f"Database error: {str(e)}"}
         except Exception as e:
-            print(f"Unexpected Error: {e}")
             return {"error": f"Unexpected error: {str(e)}"}
     else:
         return quiz_object
@@ -237,8 +250,9 @@ async def generate_and_insert_quiz(user: str, quiz_string: str):
 #         raise HTTPException(status_code=204, detail="No active quiz item found for the specified user")
 #     return quiz_item
 # Define your endpoint
-@app.post("/generate_quiz")
+@app.post("/generate_quiz/")
 async def generate_quiz(user: str, quiz_string: str):
+    """Generate a quiz and insert it into the database."""
     result = await generate_and_insert_quiz(user, quiz_string)
     if "error" in result:
         raise HTTPException(status_code=400, detail=result["error"])
@@ -287,12 +301,6 @@ async def remove_item(_id: str, user: str = Query(...)):
     if quiz_item.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Item not found")
     return Response(status_code=status.HTTP_200_OK)
-
-# if __name__ == "__main__":
-#     import uvicorn
-#     uvicorn.run("app:app", host="0.0.0.0", port=8000)
-
-
 
 
 
