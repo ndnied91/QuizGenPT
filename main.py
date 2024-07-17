@@ -26,6 +26,11 @@ from typing import Any
 from fastapi import HTTPException
 from pymongo import errors
 
+from motor.motor_asyncio import AsyncIOMotorClient
+import json
+from pymongo import errors
+
+
 load_dotenv()
 
 app = FastAPI()
@@ -194,27 +199,25 @@ except Exception as e:
 
 
 # Function to generate and insert a quiz
-async def generate_and_insert_quiz(user: str, quiz_string: str) -> Any:
+async def generate_and_insert_quiz(user: str, quiz_string: str):
     try:
         quiz_object = json.loads(quiz_string)
     except json.JSONDecodeError:
+        print("Invalid quiz data received")
         return {"error": "Invalid quiz data received"}
 
-    print(user)
+    print(f"User: {user}")
     if user != 'null':
         try:
             quiz_item = QuizItem(user=user, quiz=quiz_object)
             quiz_item_dict = quiz_item.dict(by_alias=True)
-            # Perform the MongoDB operation using the same event loop
             db_response = await collection.insert_one(quiz_item_dict)
             inserted_document = await collection.find_one({"_id": db_response.inserted_id})
             return inserted_document
         except errors.PyMongoError as e:
-            # Log the exception for debugging purposes
             print(f"PyMongoError: {e}")
             return {"error": f"Database error: {str(e)}"}
         except Exception as e:
-            # Log any other exceptions for debugging purposes
             print(f"Unexpected Error: {e}")
             return {"error": f"Unexpected error: {str(e)}"}
     else:
