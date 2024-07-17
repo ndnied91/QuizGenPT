@@ -21,6 +21,11 @@ from typing import Any
 from fastapi import HTTPException
 from pymongo import errors
 
+import json
+from typing import Any
+from fastapi import HTTPException
+from pymongo import errors
+
 load_dotenv()
 
 app = FastAPI()
@@ -36,7 +41,6 @@ app.add_middleware(
 
 MONGO_DETAILS = os.getenv("MONGO_URI")
 client = AsyncIOMotorClient(MONGO_DETAILS, tlsAllowInvalidCertificates=True)
-
 database = client['QuizDatabase']
 collection = database["UserQuizzes"]
 
@@ -160,6 +164,36 @@ except Exception as e:
 
 
 
+# async def generate_and_insert_quiz(user: str, quiz_string: str) -> Any:
+#     try:
+#         quiz_object = json.loads(quiz_string)
+#     except json.JSONDecodeError:
+#         return {"error": "Invalid quiz data received"}
+
+#     print(user)
+#     if user != 'null':
+#         try:
+#             quiz_item = QuizItem(user=user, quiz=quiz_object)
+#             quiz_item_dict = quiz_item.dict(by_alias=True)
+#             db_response = await collection.insert_one(quiz_item_dict)
+#             inserted_document = await collection.find_one({"_id": db_response.inserted_id})
+#             return inserted_document
+#         except errors.PyMongoError as e:
+#             # Log the exception for debugging purposes
+#             print(f"PyMongoError: {e}")
+#             return {"error": f"Database error: {str(e)}"}
+#         except Exception as e:
+#             # Log any other exceptions for debugging purposes
+#             print(f"Unexpected Error: {e}")
+#             return {"error": f"Unexpected error: {str(e)}"}
+#     else:
+#         return quiz_object
+    
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+
+
+# Function to generate and insert a quiz
 async def generate_and_insert_quiz(user: str, quiz_string: str) -> Any:
     try:
         quiz_object = json.loads(quiz_string)
@@ -171,6 +205,7 @@ async def generate_and_insert_quiz(user: str, quiz_string: str) -> Any:
         try:
             quiz_item = QuizItem(user=user, quiz=quiz_object)
             quiz_item_dict = quiz_item.dict(by_alias=True)
+            # Perform the MongoDB operation using the same event loop
             db_response = await collection.insert_one(quiz_item_dict)
             inserted_document = await collection.find_one({"_id": db_response.inserted_id})
             return inserted_document
@@ -184,11 +219,9 @@ async def generate_and_insert_quiz(user: str, quiz_string: str) -> Any:
             return {"error": f"Unexpected error: {str(e)}"}
     else:
         return quiz_object
-    
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 
-
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
  
 # @app.get("/api/quiz", response_model=QuizItem)
@@ -200,6 +233,7 @@ async def generate_and_insert_quiz(user: str, quiz_string: str) -> Any:
 #     if quiz_item is None:
 #         raise HTTPException(status_code=204, detail="No active quiz item found for the specified user")
 #     return quiz_item
+# Define your endpoint
 @app.post("/generate_quiz")
 async def generate_quiz(user: str, quiz_string: str):
     result = await generate_and_insert_quiz(user, quiz_string)
@@ -251,7 +285,17 @@ async def remove_item(_id: str, user: str = Query(...)):
         raise HTTPException(status_code=404, detail="Item not found")
     return Response(status_code=status.HTTP_200_OK)
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("app:app", host="0.0.0.0", port=8000)
+# if __name__ == "__main__":
+#     import uvicorn
+#     uvicorn.run("app:app", host="0.0.0.0", port=8000)
 
+
+
+
+import asyncio
+
+async def main():
+    # Your application startup code here
+
+    if __name__ == "__main__":
+        asyncio.run(main())
