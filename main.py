@@ -12,16 +12,9 @@ import pytz
 from dotenv import load_dotenv
 from pymongo import errors
 import asyncio
-import os
+
 from utils import generate_question
-# 
-from typing import Any, Dict
-from fastapi import HTTPException
-from pydantic import BaseModel, Field
-from datetime import datetime
-from bson import ObjectId
-import json
-import logging
+
 load_dotenv()
 
 app = FastAPI()
@@ -68,7 +61,7 @@ class QuizItem(BaseModel):
     id: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
     timestamp: datetime = Field(default_factory=get_current_time_in_edt)
     user: str
-    quiz: List[Dict]  # Updated to accept a list of dictionaries
+    quiz: object
     is_active: bool = True  # New boolean field set to True by default
 
     class Config:
@@ -91,46 +84,6 @@ except Exception as e:
     print("error")
 
 
-# async def generate_and_insert_quiz(user: str, quiz_string: str) -> Any:
-#     try:
-#         quiz_object = json.loads(quiz_string)
-#     except json.JSONDecodeError:
-#         return {"error": "Invalid quiz data received"}
-
-#     print(user)
-#     if user != 'null':
-#         quiz_item = QuizItem(user=user, quiz=quiz_object)
-#         quiz_item_dict = quiz_item.dict(by_alias=True)
-#         db_response = await collection.insert_one(quiz_item_dict)
-#         inserted_document = await collection.find_one({"_id": db_response.inserted_id})
-#         return inserted_document
-#     else:
-#         return quiz_object
-
-# async def generate_and_insert_quiz(user: str, quiz_string: str) -> Any:
-#     try:
-#         quiz_object = json.loads(quiz_string)
-#     except json.JSONDecodeError:
-#         return {"error": "Invalid quiz data received"}
-
-#     print(user)
-#     if user != 'null':
-#         try:
-#             quiz_item = QuizItem(user=user, quiz=quiz_object)
-#             quiz_item_dict = quiz_item.dict(by_alias=True)
-#             db_response = await collection.insert_one(quiz_item_dict)
-#             inserted_document = await collection.find_one({"_id": db_response.inserted_id})
-#             return inserted_document
-#         except errors.PyMongoError as e:
-#             # Log the exception for debugging purposes
-#             print(f"PyMongoError: {e}")
-#             return {"error": f"Database error: {str(e)}"}
-#         except Exception as e:
-#             # Log any other exceptions for debugging purposes
-#             print(f"Unexpected Error: {e}")
-#             return {"error": f"Unexpected error: {str(e)}"}
-#     else:
-#         return quiz_object
 async def generate_and_insert_quiz(user: str, quiz_string: str) -> Any:
     try:
         quiz_object = json.loads(quiz_string)
@@ -139,13 +92,6 @@ async def generate_and_insert_quiz(user: str, quiz_string: str) -> Any:
 
     print(user)
     if user != 'null':
-        # Ensure quiz_object is a list of dictionaries
-        if not isinstance(quiz_object, list):
-            return {"error": "Quiz data must be a list of dictionaries"}
-        for item in quiz_object:
-            if not isinstance(item, dict):
-                return {"error": "Each quiz item must be a dictionary"}
-        
         quiz_item = QuizItem(user=user, quiz=quiz_object)
         quiz_item_dict = quiz_item.dict(by_alias=True)
         db_response = await collection.insert_one(quiz_item_dict)
@@ -153,6 +99,61 @@ async def generate_and_insert_quiz(user: str, quiz_string: str) -> Any:
         return inserted_document
     else:
         return quiz_object
+
+async def generate_and_insert_quiz(user: str, quiz_string: str) -> Any:
+    try:
+        # Attempt to parse the quiz string into a Python list of dictionaries
+        quiz_object = json.loads(quiz_string)
+    except json.JSONDecodeError:
+        # Handle JSON decoding errors
+        print("Invalid quiz data received")
+        return {"error": "Invalid quiz data received"}
+
+    print(user)
+    if user != 'null':
+        try:
+            # Ensure quiz_object is a list of dictionaries
+            if not isinstance(quiz_object, list):
+                raise ValueError("Quiz data must be a list of dictionaries")
+            for item in quiz_object:
+                if not isinstance(item, dict):
+                    raise ValueError("Each quiz item must be a dictionary")
+
+            # Create the QuizItem instance
+            quiz_item = QuizItem(user=user, quiz=quiz_object)
+            quiz_item_dict = quiz_item.dict(by_alias=True)
+
+            # Insert the dictionary into the MongoDB collection
+            db_response = await collection.insert_one(quiz_item_dict)
+            print(f"Insert response: {db_response.inserted_id}")
+
+            # Fetch the inserted document
+            inserted_document = await collection.find_one({"_id": db_response.inserted_id})
+            print(f"Found inserted document: {inserted_document}")
+
+            return inserted_document
+
+        except errors.PyMongoError as e:
+            # Log MongoDB related exceptions
+            print(f"PyMongoError: {e}")
+            return {"error": f"Database error: {str(e)}"}
+
+        except ValueError as e:
+            # Log value-related exceptions
+            print(f"ValueError: {e}")
+            return {"error": f"Invalid quiz data format: {str(e)}"}
+
+        except Exception as e:
+            # Log any other exceptions
+            print(f"Unexpected Error: {e}")
+            return {"error": f"Unexpected error: {str(e)}"}
+
+    else:
+        return quiz_object
+
+
+
+
 
  
 @app.get("/api/quiz", response_model=QuizItem)
@@ -209,11 +210,7 @@ async def remove_item(_id: str, user: str = Query(...)):
         raise HTTPException(status_code=404, detail="Item not found")
     return Response(status_code=status.HTTP_200_OK)
 
-# if __name__ == "__main__":
-#     import uvicorn
-#     uvicorn.run("app:app", host="0.0.0.0", port=8000)
-
-
-import uvicorn
 if __name__ == "__main__":
+    import uvicorn
     uvicorn.run("app:app", host="0.0.0.0", port=8000)
+
