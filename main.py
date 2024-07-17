@@ -130,7 +130,7 @@ async def generate_and_insert_quiz(user: str, quiz_string: str) -> Any:
     except json.JSONDecodeError:
         return {"error": "Invalid quiz data received"}
 
-    print('user' , user)
+    print(user)
     if user != 'null':
         try:
             quiz_item = QuizItem(user=user, quiz=quiz_object)
@@ -205,4 +205,4 @@ async def remove_item(_id: str, user: str = Query(...)):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run("app:app", host="0.0.0.0", port=8000)
