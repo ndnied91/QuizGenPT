@@ -12,7 +12,7 @@ import pytz
 from dotenv import load_dotenv
 from pymongo import errors
 import asyncio
-
+import os
 from utils import generate_question
 
 load_dotenv()
@@ -59,7 +59,7 @@ def get_current_time_in_edt():
 
 class QuizItem(BaseModel):
     id: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
-    timestamp: datetime = Field(default_factory=get_current_time_in_edt)
+    timestamp: datetime = Field(default_factory=datetime.utcnow)  # Updated to use UTC time
     user: str
     quiz: object
     is_active: bool = True  # New boolean field set to True by default
@@ -128,9 +128,8 @@ async def generate_and_insert_quiz(user: str, quiz_string: str) -> Any:
     try:
         quiz_object = json.loads(quiz_string)
     except json.JSONDecodeError:
-        return {"error": "Invalid quiz data received"}
+        raise HTTPException(status_code=400, detail="Invalid quiz data received")
 
-    print(user)
     if user != 'null':
         try:
             quiz_item = QuizItem(user=user, quiz=quiz_object)
@@ -141,12 +140,10 @@ async def generate_and_insert_quiz(user: str, quiz_string: str) -> Any:
 
             return inserted_document
         except Exception as e:
-            # Log the exception for debugging purposes
-            print(f"Unexpected Error: {e}")
-            return {"error": f"Unexpected error: {str(e)}"}
+            logger.error(f"Unexpected Error: {e}")
+            raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
     else:
         return quiz_object
-
 
  
 @app.get("/api/quiz", response_model=QuizItem)
@@ -203,6 +200,11 @@ async def remove_item(_id: str, user: str = Query(...)):
         raise HTTPException(status_code=404, detail="Item not found")
     return Response(status_code=status.HTTP_200_OK)
 
+# if __name__ == "__main__":
+#     import uvicorn
+#     uvicorn.run("app:app", host="0.0.0.0", port=8000)
+
+
+import uvicorn
 if __name__ == "__main__":
-    import uvicorn
     uvicorn.run("app:app", host="0.0.0.0", port=8000)
