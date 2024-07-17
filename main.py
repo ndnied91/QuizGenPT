@@ -66,9 +66,9 @@ def get_current_time_in_edt():
 
 class QuizItem(BaseModel):
     id: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=get_current_time_in_edt)
     user: str
-    quiz: Dict  # Assuming quiz is a dictionary
+    quiz: List[Dict]  # Updated to accept a list of dictionaries
     is_active: bool = True  # New boolean field set to True by default
 
     class Config:
@@ -135,21 +135,22 @@ async def generate_and_insert_quiz(user: str, quiz_string: str) -> Any:
     try:
         quiz_object = json.loads(quiz_string)
     except json.JSONDecodeError:
-        print("Invalid quiz data received")
-        raise HTTPException(status_code=400, detail="Invalid quiz data received")
+        return {"error": "Invalid quiz data received"}
 
+    print(user)
     if user != 'null':
-        try:
-            quiz_item = QuizItem(user=user, quiz=quiz_object)
-            quiz_item_dict = quiz_item.dict(by_alias=True)
-
-            db_response = await collection.insert_one(quiz_item_dict)
-            inserted_document = await collection.find_one({"_id": db_response.inserted_id})
-
-            return inserted_document
-        except Exception as e:
-            print(f"Unexpected Error: {e}")
-            raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+        # Ensure quiz_object is a list of dictionaries
+        if not isinstance(quiz_object, list):
+            return {"error": "Quiz data must be a list of dictionaries"}
+        for item in quiz_object:
+            if not isinstance(item, dict):
+                return {"error": "Each quiz item must be a dictionary"}
+        
+        quiz_item = QuizItem(user=user, quiz=quiz_object)
+        quiz_item_dict = quiz_item.dict(by_alias=True)
+        db_response = await collection.insert_one(quiz_item_dict)
+        inserted_document = await collection.find_one({"_id": db_response.inserted_id})
+        return inserted_document
     else:
         return quiz_object
 
