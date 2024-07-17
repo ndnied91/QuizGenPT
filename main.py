@@ -17,14 +17,6 @@ load_dotenv()
 
 app = FastAPI()
 
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["http://localhost:5173"],
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -96,6 +88,7 @@ async def generate_and_insert_quiz(user: str, quiz_string: str) -> Any:
     except json.JSONDecodeError:
         return {"error": "Invalid quiz data received"}
 
+    print(user)
     if user != 'null':
         quiz_item = QuizItem(user=user, quiz=quiz_object)
         quiz_item_dict = quiz_item.dict(by_alias=True)

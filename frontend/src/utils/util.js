@@ -12,7 +12,7 @@ import axios from 'axios';
 
 const baseURL =
   process.env.NODE_ENV === 'production'
-    ? 'https://your-backend.onrender.com/api'
+    ? 'https://quizgenpt-fastapi.onrender.com/api'
     : 'http://localhost:8000/api';
 
 const customFetch = axios.create({

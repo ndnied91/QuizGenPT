@@ -28,5 +28,7 @@ def generate_question(input):
       ,
       model="gpt-3.5-turbo",
   )
+  print('data:')
+  print(chat_completion.choices[0].message.content)
   return chat_completion.choices[0].message.content
 
