@@ -10,6 +10,7 @@ import json
 import os
 import pytz
 from dotenv import load_dotenv
+from pymongo import errors
 
 from utils import generate_question
 
@@ -82,6 +83,22 @@ except Exception as e:
     print("error")
 
 
+# async def generate_and_insert_quiz(user: str, quiz_string: str) -> Any:
+#     try:
+#         quiz_object = json.loads(quiz_string)
+#     except json.JSONDecodeError:
+#         return {"error": "Invalid quiz data received"}
+
+#     print(user)
+#     if user != 'null':
+#         quiz_item = QuizItem(user=user, quiz=quiz_object)
+#         quiz_item_dict = quiz_item.dict(by_alias=True)
+#         db_response = await collection.insert_one(quiz_item_dict)
+#         inserted_document = await collection.find_one({"_id": db_response.inserted_id})
+#         return inserted_document
+#     else:
+#         return quiz_object
+
 async def generate_and_insert_quiz(user: str, quiz_string: str) -> Any:
     try:
         quiz_object = json.loads(quiz_string)
@@ -90,11 +107,20 @@ async def generate_and_insert_quiz(user: str, quiz_string: str) -> Any:
 
     print(user)
     if user != 'null':
-        quiz_item = QuizItem(user=user, quiz=quiz_object)
-        quiz_item_dict = quiz_item.dict(by_alias=True)
-        db_response = await collection.insert_one(quiz_item_dict)
-        inserted_document = await collection.find_one({"_id": db_response.inserted_id})
-        return inserted_document
+        try:
+            quiz_item = QuizItem(user=user, quiz=quiz_object)
+            quiz_item_dict = quiz_item.dict(by_alias=True)
+            db_response = await collection.insert_one(quiz_item_dict)
+            inserted_document = await collection.find_one({"_id": db_response.inserted_id})
+            return inserted_document
+        except errors.PyMongoError as e:
+            # Log the exception for debugging purposes
+            print(f"PyMongoError: {e}")
+            return {"error": f"Database error: {str(e)}"}
+        except Exception as e:
+            # Log any other exceptions for debugging purposes
+            print(f"Unexpected Error: {e}")
+            return {"error": f"Unexpected error: {str(e)}"}
     else:
         return quiz_object
 
