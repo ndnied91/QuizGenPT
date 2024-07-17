@@ -14,7 +14,14 @@ from pymongo import errors
 import asyncio
 import os
 from utils import generate_question
-
+# 
+from typing import Any, Dict
+from fastapi import HTTPException
+from pydantic import BaseModel, Field
+from datetime import datetime
+from bson import ObjectId
+import json
+import logging
 load_dotenv()
 
 app = FastAPI()
@@ -59,9 +66,9 @@ def get_current_time_in_edt():
 
 class QuizItem(BaseModel):
     id: Optional[str] = Field(default_factory=lambda: str(ObjectId()), alias="_id")
-    timestamp: datetime = Field(default_factory=datetime.utcnow)  # Updated to use UTC time
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
     user: str
-    quiz: object
+    quiz: Dict  # Assuming quiz is a dictionary
     is_active: bool = True  # New boolean field set to True by default
 
     class Config:
@@ -128,6 +135,7 @@ async def generate_and_insert_quiz(user: str, quiz_string: str) -> Any:
     try:
         quiz_object = json.loads(quiz_string)
     except json.JSONDecodeError:
+        print("Invalid quiz data received")
         raise HTTPException(status_code=400, detail="Invalid quiz data received")
 
     if user != 'null':
@@ -140,7 +148,7 @@ async def generate_and_insert_quiz(user: str, quiz_string: str) -> Any:
 
             return inserted_document
         except Exception as e:
-            logger.error(f"Unexpected Error: {e}")
+            print(f"Unexpected Error: {e}")
             raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
     else:
         return quiz_object
