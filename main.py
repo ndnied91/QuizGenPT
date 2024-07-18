@@ -185,19 +185,27 @@ async def generate_quiz(user: str, question: Question):
 async def update_item(_id: str, body: UpdateRequest = Body(...)):
     user = body.user
     to_update = body.to_update
+    print('calling...')
 
-    quiz_item = await collection.find_one({"_id": _id, "user": user})
-    if not quiz_item:
-        raise HTTPException(status_code=404, detail="Item not found")
+    try:
+        quiz_item = await collection.find_one({"_id": _id, "user": user})
+        if not quiz_item:
+            raise HTTPException(status_code=404, detail="Item not found")
 
-    update_result = await collection.find_one_and_update(
-        {"_id": _id, "user": user}, {"$set": to_update}
-    )
-    
-    if not update_result:
-        raise HTTPException(status_code=404, detail="Item not updated")
-    
-    return JSONResponse(status_code=status.HTTP_200_OK, content={"message": "Item updated successfully"})
+        update_result = await collection.find_one_and_update(
+            {"_id": _id, "user": user}, {"$set": to_update}
+        )
+
+        if not update_result:
+            raise HTTPException(status_code=404, detail="Item not updated")
+
+        return JSONResponse(status_code=status.HTTP_200_OK, content={"message": "Item updated successfully"})
+    except errors.PyMongoError as e:
+        print(f"Database error: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 ########################################################################################################
 
