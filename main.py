@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, status, Query, Body
+from fastapi import FastAPI, HTTPException, status, Query, Body , Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
@@ -211,22 +211,25 @@ async def update_item(_id: str, body: UpdateRequest = Body(...)):
 ########################################################################################################
 
 @app.get("/api/quiz", response_model=QuizItem)
-async def get_active_quiz_item(user: str = Query(...)):
-    print('calling get_active_quiz_item...')
-    
+async def get_active_quiz_item(user: str = Query(...), db_client: AsyncIOMotorClient = Depends(get_db_client)):
+    print(f"Calling get_active_quiz_item for user: {user}")
+
     try:
-        quiz_item = await collection.find_one({"is_active": True, "user": user})
+        # Ensure the collection is correctly accessed
+        collection = db_client["QuizDatabase"]["UserQuizzes"]
         
+        quiz_item = await collection.find_one({"is_active": True, "user": user})
+
         if quiz_item is None:
             raise HTTPException(status_code=204, detail="No active quiz item found for the specified user")
         
         return quiz_item
     except errors.PyMongoError as e:
         print(f"Database error: {e}")
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        raise HTTPException(status_code=500, detail="Internal Server Error - Database Error")
     except Exception as e:
         print(f"Unexpected error: {e}")
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        raise HTTPException(status_code=500, detail="Internal Server Error - Unexpected Error")
 
 ########################################################################################################
 
