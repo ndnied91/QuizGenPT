@@ -182,13 +182,15 @@ async def generate_quiz(user: str, question: Question):
 
 
 @app.post("/api/quiz/{_id}")
-async def update_item(_id: str, body: UpdateRequest = Body(...)):
-    print('calling update_item')
+async def update_item(_id: str, body: UpdateRequest = Body(...), db_client: AsyncIOMotorClient = Depends(get_db_client)):
+    print('Calling update_item')
     user = body.user
     to_update = body.to_update
-    print('calling...')
 
     try:
+        # Ensure the collection is correctly accessed
+        collection = db_client["QuizDatabase"]["UserQuizzes"]
+
         quiz_item = await collection.find_one({"_id": _id, "user": user})
         if not quiz_item:
             raise HTTPException(status_code=404, detail="Item not found")
@@ -200,15 +202,15 @@ async def update_item(_id: str, body: UpdateRequest = Body(...)):
         if not update_result:
             raise HTTPException(status_code=404, detail="Item not updated")
 
-        return JSONResponse(status_code=status.HTTP_200_OK, content={"message": "Item updated successfully"})
+        return {"message": "Item updated successfully"}
     except errors.PyMongoError as e:
         print(f"Database error: {e}")
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        raise HTTPException(status_code=500, detail="Internal Server Error - Database Error")
     except Exception as e:
         print(f"Unexpected error: {e}")
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        raise HTTPException(status_code=500, detail="Internal Server Error - Unexpected Error")
 
-########################################################################################################
+
 
 @app.get("/api/quiz", response_model=QuizItem)
 async def get_active_quiz_item(user: str = Query(...), db_client: AsyncIOMotorClient = Depends(get_db_client)):
@@ -217,7 +219,6 @@ async def get_active_quiz_item(user: str = Query(...), db_client: AsyncIOMotorCl
     try:
         # Ensure the collection is correctly accessed
         collection = db_client["QuizDatabase"]["UserQuizzes"]
-        
         quiz_item = await collection.find_one({"is_active": True, "user": user})
 
         if quiz_item is None:
@@ -231,7 +232,6 @@ async def get_active_quiz_item(user: str = Query(...), db_client: AsyncIOMotorCl
         print(f"Unexpected error: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error - Unexpected Error")
 
-########################################################################################################
 
 @app.get("/api/archives/{user}")
 async def get_user_archives(user: str):
