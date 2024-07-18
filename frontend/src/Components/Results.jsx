@@ -93,7 +93,7 @@ const Results = ({
           <p>
             <IoMdClose />
           </p>
-          <p className="text-xs pl-0.5">Wrong :/</p>
+          <p className="text-xs pl-0.5">Wrong</p>
         </div>
       );
     } else if (correctAnswer === currentItem) {

@@ -26,10 +26,10 @@ const QuizQuestionnaire = ({ quiz, setCompleted, setAnswerKey }) => {
 
   return (
     <div className="p-4">
-      <div className="flex flex-col items-center justify-center ">
-        <div className="w-1/2 bg-gray-300 h-4 rounded mb-4">
+      <div className="flex flex-col items-center justify-center">
+        <div className="w-1/2 bg-gray-300 h-4 rounded mb-4 ">
           <div
-            className="h-4 bg-blue-500 rounded "
+            className="h-4 bg-blue-500 rounded"
             style={{ width: `${getProgress()}%` }}
           />
         </div>
@@ -38,13 +38,20 @@ const QuizQuestionnaire = ({ quiz, setCompleted, setAnswerKey }) => {
             {currentIndex + 1}. {quiz[currentIndex].question}
           </p>
 
+          <p className="text-sm italic text-gray-600 mb-4">
+            {' '}
+            Please select an answer below{' '}
+          </p>
+
           <div className="cursor-pointer">
             {quiz[currentIndex].answers.map((answer, index) => {
               return (
                 <div
-                  className={
-                    selectedAnswer === answer ? 'text-red-500' : 'text-gray-900'
-                  }
+                  className={`${
+                    selectedAnswer === answer
+                      ? 'text-red-500 m-1 hover:opacity-50 duration-100 hover:scale-[1.0005]'
+                      : 'text-gray-900 m-1 hover:opacity-50 duration-100 hover:scale-[1.0005]'
+                  }`}
                   key={index}
                   onClick={() => setSelectedAnswer(answer)}
                 >
