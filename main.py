@@ -222,7 +222,6 @@ async def get_active_quiz_item(user: str = Query(...), db_client: AsyncIOMotorCl
         raise HTTPException(status_code=500, detail="Internal Server Error - Unexpected Error")
 
 
-#### STILL TO DO 
 @app.get("/api/archives/{user}", response_model=List[QuizItem])
 async def get_user_archives(user: str, db_client: AsyncIOMotorClient = Depends(get_db_client)):
     try:
@@ -243,20 +242,34 @@ async def get_user_archives(user: str, db_client: AsyncIOMotorClient = Depends(g
         raise HTTPException(status_code=500, detail="Internal Server Error - Database Error")
     
     except HTTPException as http_error:
-        # Re-raise HTTPException to propagate specific HTTP status codes
         raise http_error
     
     except Exception as e:
         print(f"Unexpected error: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error - Unexpected Error")
 
-#### STILL TO DO 
+
 @app.delete("/api/quiz/{_id}")
-async def remove_item(_id: str, user: str = Query(...)):
-    quiz_item = await collection.delete_one({"_id": _id, "user": user})
-    if quiz_item.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Item not found")
-    return Response(status_code=status.HTTP_200_OK)
+async def remove_item(_id: str, user: str = Query(...), db_client: AsyncIOMotorClient = Depends(get_db_client)):
+    try:
+        collection = db_client["QuizDatabase"]["UserQuizzes"]
+        quiz_item = await collection.delete_one({"_id": _id, "user": user})
+
+        if quiz_item.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Item not found")
+        
+        return Response(status_code=status.HTTP_200_OK)
+    
+    except errors.PyMongoError as e:
+        print(f"Database error: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error - Database Error")
+    
+    except HTTPException as http_error:
+        raise http_error
+    
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error - Unexpected Error")
 
 
 
