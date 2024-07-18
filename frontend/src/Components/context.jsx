@@ -11,6 +11,7 @@ export const AppProvider = ({ children }) => {
   const [quiz, setQuiz] = useState();
   const [quizID, setQuizID] = useState('');
   const [archives, setArchives] = useState([]);
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(true);
 
   useEffect(() => {
     setActiveUser(user);
@@ -43,6 +44,8 @@ export const AppProvider = ({ children }) => {
         setQuizID,
         archives,
         setArchives,
+        isInfoModalOpen,
+        setIsInfoModalOpen,
       }}
     >
       {children}

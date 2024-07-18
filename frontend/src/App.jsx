@@ -6,16 +6,16 @@ import { useGlobalContext } from './Components/context';
 import Archives from './Components/Archives';
 import { FaArchive } from 'react-icons/fa';
 import { FaArrowLeft } from 'react-icons/fa6';
+import IntroModal from './Components/IntroModal';
 
 const App = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { activeUser, quiz } = useGlobalContext();
+  const { activeUser, quiz, isInfoModalOpen, setIsInfoModalOpen } =
+    useGlobalContext();
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
   const [isArchives, setIsArchives] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-
-  console.log(quiz);
 
   return (
     <main className="lg:m-5 mt-5 overflow-x-hidden overflow-y-scroll h-[80vh] bg-gray-50">
@@ -100,6 +100,12 @@ const App = () => {
               <div className="heartbeat"></div>
               <div className="heartbeat delay-1"></div>
               <div className="heartbeat delay-2"></div>
+            </div>
+            <div className="bg-red-400">
+              <IntroModal
+                isInfoModalOpen={isInfoModalOpen}
+                setIsInfoModalOpen={setIsInfoModalOpen}
+              />
             </div>
           </div>
         )}

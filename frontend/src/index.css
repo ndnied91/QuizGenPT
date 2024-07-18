@@ -146,3 +146,16 @@ body {
   display: inline-block;
   animation: heartbeat-opacity 2s ease-in-out infinite;
 }
+
+
+
+
+/* Add this CSS to your stylesheet or style component */
+.fade-in {
+  opacity: 0;
+  transition: opacity 1s ease-in;
+}
+
+.fade-in.visible {
+  opacity: 1;
+}

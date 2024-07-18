@@ -4,6 +4,7 @@ import { Spinner } from './Spinner';
 import { toast } from 'react-toastify';
 import { useGlobalContext } from './context';
 import FormItem from './FormItem';
+import Jokes from './Jokes';
 
 const QuizForm = ({ loading, setLoading }) => {
   const { setQuiz, activeUser, setQuizID } = useGlobalContext();
@@ -68,6 +69,9 @@ const QuizForm = ({ loading, setLoading }) => {
     return (
       <div>
         <Spinner />
+        <div className="mt-4">
+          <Jokes />
+        </div>
       </div>
     );
   } else {
