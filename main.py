@@ -6,33 +6,28 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from typing import List, Optional, Dict, Any
 from bson import ObjectId
 from datetime import datetime
-import json
+
 import os
 import pytz
 from dotenv import load_dotenv
 from pymongo import errors
 import asyncio
-from motor.motor_asyncio import AsyncIOMotorClient
 from typing import Optional
 
 from utils import generate_question
-
-import asyncio
-import json
 from typing import Any
 from fastapi import HTTPException
-from pymongo import errors
-
 import json
-from typing import Any
-from fastapi import HTTPException
-from pymongo import errors
-
-from motor.motor_asyncio import AsyncIOMotorClient
-import json
-from pymongo import errors
 
 from mongodb import connect_db, close_db, get_db_client
+
+############################################################
+from fastapi import FastAPI, HTTPException, Body, status
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+import motor.motor_asyncio
+
+############################################################
 
 load_dotenv()
 
@@ -169,18 +164,45 @@ async def generate_quiz(user: str, question: Question):
     return await generate_and_insert_quiz(user, quiz_string)
 
     
+# @app.post("/api/quiz/{_id}")
+# async def update_item(_id: str, body: UpdateRequest = Body(...)):
+#     user = body.user
+#     to_update = body.to_update
+#     print('calling...')
+
+#     quiz_item = await collection.find_one({"_id": _id, "user": user})
+#     if not quiz_item:
+#         raise HTTPException(status_code=404, detail="Item not found")
+
+#     await collection.find_one_and_update({"_id": _id, "user": user}, {"$set": to_update})
+#     return Response(status_code=status.HTTP_200_OK)
+
+
 @app.post("/api/quiz/{_id}")
 async def update_item(_id: str, body: UpdateRequest = Body(...)):
     user = body.user
     to_update = body.to_update
-    print('calling...')
 
     quiz_item = await collection.find_one({"_id": _id, "user": user})
     if not quiz_item:
         raise HTTPException(status_code=404, detail="Item not found")
 
-    await collection.find_one_and_update({"_id": _id, "user": user}, {"$set": to_update})
-    return Response(status_code=status.HTTP_200_OK)
+    update_result = await collection.find_one_and_update(
+        {"_id": _id, "user": user}, {"$set": to_update}
+    )
+    
+    if not update_result:
+        raise HTTPException(status_code=404, detail="Item not updated")
+    
+    return JSONResponse(status_code=status.HTTP_200_OK, content={"message": "Item updated successfully"})
+
+########################################################################################################
+
+
+
+
+
+
 
 @app.get("/api/quiz", response_model=QuizItem)
 async def get_active_quiz_item(user: str = Query(...)):
