@@ -183,6 +183,7 @@ async def generate_quiz(user: str, question: Question):
 
 @app.post("/api/quiz/{_id}")
 async def update_item(_id: str, body: UpdateRequest = Body(...)):
+    print('calling update_item')
     user = body.user
     to_update = body.to_update
     print('calling...')
@@ -209,21 +210,25 @@ async def update_item(_id: str, body: UpdateRequest = Body(...)):
 
 ########################################################################################################
 
-
-
-
-
-
-
 @app.get("/api/quiz", response_model=QuizItem)
 async def get_active_quiz_item(user: str = Query(...)):
-    # Retrieve a single document where is_active is True and user matches the query parameter
-    quiz_item = await collection.find_one({"is_active": True, "user": user})
+    print('calling get_active_quiz_item...')
+    
+    try:
+        quiz_item = await collection.find_one({"is_active": True, "user": user})
+        
+        if quiz_item is None:
+            raise HTTPException(status_code=204, detail="No active quiz item found for the specified user")
+        
+        return quiz_item
+    except errors.PyMongoError as e:
+        print(f"Database error: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
-    if quiz_item is None:
-        raise HTTPException(status_code=204, detail="No active quiz item found for the specified user")
-    return quiz_item
-
+########################################################################################################
 
 @app.get("/api/archives/{user}")
 async def get_user_archives(user: str):
