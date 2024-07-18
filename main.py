@@ -149,7 +149,7 @@ async def generate_quiz(user: str, quiz_string: str):
         raise HTTPException(status_code=400, detail=result["error"])
     return result
 
-
+#### STILL TO DO 
 @app.post("/api/quiz/article")
 async def generate_quiz_from_article(user: str, url_question: URL_Question):
     quiz_string = generate_question(
@@ -167,20 +167,6 @@ async def generate_quiz(user: str, question: Question):
     return await generate_and_insert_quiz(user, quiz_string)
 
     
-# @app.post("/api/quiz/{_id}")
-# async def update_item(_id: str, body: UpdateRequest = Body(...)):
-#     user = body.user
-#     to_update = body.to_update
-#     print('calling...')
-
-#     quiz_item = await collection.find_one({"_id": _id, "user": user})
-#     if not quiz_item:
-#         raise HTTPException(status_code=404, detail="Item not found")
-
-#     await collection.find_one_and_update({"_id": _id, "user": user}, {"$set": to_update})
-#     return Response(status_code=status.HTTP_200_OK)
-
-
 @app.post("/api/quiz/{_id}")
 async def update_item(_id: str, body: UpdateRequest = Body(...), db_client: AsyncIOMotorClient = Depends(get_db_client)):
     print('Calling update_item')
@@ -211,13 +197,11 @@ async def update_item(_id: str, body: UpdateRequest = Body(...), db_client: Asyn
         raise HTTPException(status_code=500, detail="Internal Server Error - Unexpected Error")
 
 
-
 @app.get("/api/quiz", response_model=QuizItem)
 async def get_active_quiz_item(user: str = Query(...), db_client: AsyncIOMotorClient = Depends(get_db_client)):
     print(f"Calling get_active_quiz_item for user: {user}")
 
     try:
-        # Ensure the collection is correctly accessed
         collection = db_client["QuizDatabase"]["UserQuizzes"]
         quiz_item = await collection.find_one({"is_active": True, "user": user})
 
@@ -225,22 +209,48 @@ async def get_active_quiz_item(user: str = Query(...), db_client: AsyncIOMotorCl
             raise HTTPException(status_code=204, detail="No active quiz item found for the specified user")
         
         return quiz_item
+    
     except errors.PyMongoError as e:
         print(f"Database error: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error - Database Error")
+    
+    except HTTPException as http_error:
+        raise http_error
+    
     except Exception as e:
         print(f"Unexpected error: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error - Unexpected Error")
 
 
-@app.get("/api/archives/{user}")
-async def get_user_archives(user: str):
-    quiz_cursor = collection.find({"is_active": False, "user": user})
-    quiz_items = await quiz_cursor.to_list(length=None)
-    if not quiz_items:
-        raise HTTPException(status_code=204, detail="No archived quiz items found for the specified user")
-    return quiz_items
+#### STILL TO DO 
+@app.get("/api/archives/{user}", response_model=List[QuizItem])
+async def get_user_archives(user: str, db_client: AsyncIOMotorClient = Depends(get_db_client)):
+    try:
+        # Access the collection
+        collection = db_client["QuizDatabase"]["UserQuizzes"]
+        
+        # Fetch all archived quiz items for the specified user
+        quiz_cursor = collection.find({"is_active": False, "user": user})
+        quiz_items = await quiz_cursor.to_list(length=None)
+        
+        if not quiz_items:
+            raise HTTPException(status_code=204, detail="No archived quiz items found for the specified user")
+        
+        return quiz_items
+    
+    except errors.PyMongoError as e:
+        print(f"Database error: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error - Database Error")
+    
+    except HTTPException as http_error:
+        # Re-raise HTTPException to propagate specific HTTP status codes
+        raise http_error
+    
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error - Unexpected Error")
 
+#### STILL TO DO 
 @app.delete("/api/quiz/{_id}")
 async def remove_item(_id: str, user: str = Query(...)):
     quiz_item = await collection.delete_one({"_id": _id, "user": user})
