@@ -19,6 +19,7 @@ from typing import Any
 from fastapi import HTTPException
 import json
 
+
 from mongodb import connect_db, close_db, get_db_client
 
 ############################################################
@@ -39,12 +40,14 @@ app.add_event_handler("startup", connect_db)
 app.add_event_handler("shutdown", close_db)
 
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+print(f"Running in {ENVIRONMENT} environment")
 
 if ENVIRONMENT == "prod":
     allowed_origins = ["https://quizgenpt.onrender.com"]
 else:
-    allowed_origins = ["*"] 
+    allowed_origins = ["*"]
 
+print(f"Allowed origins: {allowed_origins}")
 
 app.add_middleware(
     CORSMiddleware,
