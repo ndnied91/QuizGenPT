@@ -16,7 +16,7 @@ def generate_question(input):
       messages=[
             {
                 "role": "user",
-                "content": f"""As a quiz creator, I want to create an engaging quiz of a set amount of questions. Here is the format I need the data in.
+                "content": f"""As a quiz creator, I want to create an engaging quiz of a set amount of questions with a varying level of difficulty based on the users input value of difficulty. Here is the format I need the data in.
                               The response should be an array with the following structure:
                               [
                                 {{

@@ -94,7 +94,7 @@ const App = () => {
 
         {quiz === undefined && (
           <div className="w-screen text-center">
-            <div className="m-6 relative overflow-hidden bg-gradient-to-r from-green-400 to-blue-500 text-white text-center lg:text-2xl mt-10 font-bold tracking-widest p-4 rounded-lg shadow-lg transform transition-transform hover:scale-[1.02] duration-300 heartbeat-container">
+            <div className="m-6 mb-0 relative overflow-hidden bg-gradient-to-r from-green-400 to-blue-500 text-white text-center lg:text-2xl mt-10 font-bold tracking-widest p-4 rounded-lg shadow-lg transform transition-transform hover:scale-[1.02] duration-300 heartbeat-container">
               Transform your learning journey with QuizGPT: Where every question
               sparks a new adventure!
               <div className="heartbeat"></div>
