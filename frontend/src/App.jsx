@@ -26,7 +26,7 @@ const App = () => {
             onClick={handleOpenModal}
             className="relative bg-transparent bg-gradient-to-r from-forest-green-600 to-forest-green-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-all ease-in-out hover:opacity-90 hover:scale-105 duration-300"
           >
-            Login
+            Login / Sign Up
           </button>
           <LoginModal isOpen={isModalOpen} onClose={handleCloseModal} />
         </div>
@@ -38,7 +38,7 @@ const App = () => {
               <div className="font-bold text-2xl">
                 <div className="text-blue-600">QuizGPT</div>
                 <div className="text-gray-700 text-lg lg:text-xl">
-                  Welcome back, {activeUser.firstName}!
+                  Welcome back {activeUser.firstName}!
                 </div>
               </div>
             )}
@@ -94,9 +94,9 @@ const App = () => {
 
         {quiz === undefined && (
           <div className="w-screen text-center">
-            <div className="m-6 relative overflow-hidden bg-gradient-to-r from-green-400 to-blue-500 text-white text-center lg:text-2xl mt-10 font-bold tracking-widest p-4 rounded-lg shadow-lg transform transition-transform hover:scale-105 heartbeat-container">
-              Transform Your Learning Journey with QuizGPT: Where Every Question
-              Sparks a New Adventure!
+            <div className="m-6 relative overflow-hidden bg-gradient-to-r from-green-400 to-blue-500 text-white text-center lg:text-2xl mt-10 font-bold tracking-widest p-4 rounded-lg shadow-lg transform transition-transform hover:scale-[1.02] duration-300 heartbeat-container">
+              Transform your learning journey with QuizGPT: Where every question
+              sparks a new adventure!
               <div className="heartbeat"></div>
               <div className="heartbeat delay-1"></div>
               <div className="heartbeat delay-2"></div>
