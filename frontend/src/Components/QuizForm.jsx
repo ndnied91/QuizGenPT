@@ -8,10 +8,10 @@ import Jokes from './Jokes';
 
 const QuizForm = ({ loading, setLoading }) => {
   const { setQuiz, activeUser, setQuizID } = useGlobalContext();
-  const [category, setCategory] = useState('Dogs');
+  const [category, setCategory] = useState('');
   const [questionType, setQuestionType] = useState('multiple choice');
-  const [difficulty, setDifficulty] = useState('easy');
-  const [questionCount, setQuestionCount] = useState('1');
+  const [difficulty, setDifficulty] = useState('');
+  const [questionCount, setQuestionCount] = useState('');
 
   const handleCategoryChange = (e) => {
     setCategory(e.target.value);

@@ -6,12 +6,10 @@ import FormItem from './FormItem';
 
 const QuizFromUrl = () => {
   const { setQuiz, activeUser, setQuizID } = useGlobalContext();
-  const [article, setArticle] = useState(
-    'https://education.nationalgeographic.org/resource/planet/'
-  );
+  const [article, setArticle] = useState('');
   const [questionType, setQuestionType] = useState('multiple choice');
-  const [difficulty, setDifficulty] = useState('easy');
-  const [questionCount, setQuestionCount] = useState('1');
+  const [difficulty, setDifficulty] = useState('');
+  const [questionCount, setQuestionCount] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleArticleChange = (e) => {
@@ -80,7 +78,7 @@ const QuizFromUrl = () => {
         >
           <FormItem
             itemName={'article'}
-            placeholder={'Please paste it the article URL'}
+            placeholder={'article URL'}
             itemValue={article}
             handleChangeFunc={handleArticleChange}
             type="text"
