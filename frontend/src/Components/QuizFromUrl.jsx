@@ -25,9 +25,7 @@ const QuizFromUrl = () => {
 
   const handleQuestionDifficulty = (e) => {
     const value = e.target.value;
-    if (!isNaN(value)) {
-      setDifficulty(value);
-    }
+    setDifficulty(value);
   };
 
   const handleSubmit = async (e) => {
@@ -85,7 +83,7 @@ const QuizFromUrl = () => {
           />
 
           <FormItem
-            itemName={'Difficulty'}
+            itemName={'difficulty'}
             itemValue={difficulty}
             handleChangeFunc={handleQuestionDifficulty}
             itemType={'select'}
